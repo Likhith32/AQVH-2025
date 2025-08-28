@@ -15,23 +15,22 @@ export function QuantumSecurityPanel() {
   const generateQRNGKey = async () => {
     setIsGenerating(true)
 
-    // Simulate QRNG API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
-    // Generate a mock quantum key
-    const chars = "0123456789ABCDEF"
-    let result = ""
-    for (let i = 0; i < 64; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length))
+    try {
+      // The API call now points to your deployed backend on Render
+      const response = await fetch("https://quantum-backend-1-xeg5.onrender.com/qrng")
+      const data = await response.json()
+      setQrngKey(data.qrng_key)
+      setSecurityScore(95 + Math.random() * 5)
+    } catch (err) {
+      console.error("Error fetching QRNG key:", err)
+      setQrngKey("Error: Backend not reachable")
     }
 
-    setQrngKey(result)
-    setSecurityScore(95 + Math.random() * 5)
     setIsGenerating(false)
   }
 
   useEffect(() => {
-    // Generate initial key
+    // Generate initial key on component mount
     generateQRNGKey()
   }, [])
 
